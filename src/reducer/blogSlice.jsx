@@ -6,6 +6,7 @@ const initialState = {
   blogs: [],
   error: "",
   blogDetail: {},
+  loginUser: {},
 };
 
 export const fetchUsers = createAsyncThunk("blog/fetchUsers", async () => {
@@ -41,6 +42,14 @@ export const blogSlice = createSlice({
     showBlog(state, action) {
       state.blogDetail = state.blogs[action.payload];
     },
+    login(state, action) {
+      state.loginUser = action.payload;
+      localStorage.setItem("LoginUser", JSON.stringify(state.loginUser));
+    },
+    logOut(state, action) {
+      state.loginUser = {};
+      localStorage.setItem("LoginUser", JSON.stringify(state.loginUser));
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -70,6 +79,7 @@ export const blogSlice = createSlice({
   },
 });
 
-export const { blogData, userData, showBlog } = blogSlice.actions;
+export const { blogData, userData, showBlog, login, logOut } =
+  blogSlice.actions;
 
 export default blogSlice.reducer;

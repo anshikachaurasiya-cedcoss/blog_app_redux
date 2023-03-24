@@ -1,10 +1,23 @@
 import React from "react";
-
 import MenuIcon from "@mui/icons-material/Menu";
-import { Link } from "react-router-dom";
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { useDispatch } from "react-redux";
+import { logOut } from "../reducer/blogSlice";
 
 const Navbar = (props) => {
+  let dispatch = useDispatch();
+
+  const logOutHandler = () => {
+    dispatch(logOut());
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -22,9 +35,12 @@ const Navbar = (props) => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             BLOGS
           </Typography>
-          <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
-            Login
-          </Link>
+          <Button
+            sx={{ color: "white", cursor: "pointer", textDecoration: "none" }}
+            onClick={logOutHandler}
+          >
+            Log Out
+          </Button>
         </Toolbar>
       </AppBar>
     </Box>

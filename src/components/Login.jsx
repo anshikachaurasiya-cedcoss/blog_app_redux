@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -10,7 +10,9 @@ import Container from "@mui/material/Container";
 import axios from "axios";
 import { Snackbar } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../reducer/blogSlice";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -19,6 +21,9 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const Login = () => {
   let [open, setOpen] = useState({ snackOpen: false, severity: "", msg: "" });
   let navigate = useNavigate();
+  let dispatch = useDispatch();
+  let location = useLocation();
+  const state = useSelector((state) => state.blogSlice);
 
   const handleClose = () => {
     if (open.snackOpen) {
@@ -28,6 +33,7 @@ const Login = () => {
     }
     setOpen({ ...open });
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -46,7 +52,8 @@ const Login = () => {
       open.msg = "Successfully Login!!";
       open.severity = "success";
       handleClose();
-      setTimeout(() => navigate("/blogpage"), 3000);
+      setTimeout(() => navigate("/"), 3000);
+      dispatch(login(result.data));
     } catch (error) {
       open.msg = error.response.data.message;
       open.severity = "error";
@@ -55,73 +62,78 @@ const Login = () => {
     setOpen({ ...open });
   };
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Snackbar
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          open={open.snackOpen}
-          autoHideDuration={5000}
-          onClose={handleClose}
+  if (Object.keys(state.loginUser).length > 0)
+    return <Navigate to="/" state={{ from: location }} replace />;
+  else
+    return (
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
         >
-          <Alert
+          <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            open={open.snackOpen}
+            autoHideDuration={5000}
             onClose={handleClose}
-            severity={open.severity}
-            sx={{ width: "100%" }}
           >
-            {open.msg}
-          </Alert>
-        </Snackbar>
+            <Alert
+              onClose={handleClose}
+              severity={open.severity}
+              sx={{ width: "100%" }}
+            >
+              {open.msg}
+            </Alert>
+          </Snackbar>
 
-        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="Username"
-            name="username"
-            autoComplete="username"
-            autoFocus
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
           >
-            Sign In
-          </Button>
-          <Link href="" variant="body2">
-            {"Don't have an account? Sign Up"}
-          </Link>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign In
+            </Button>
+          </Box>
         </Box>
-      </Box>
-    </Container>
-  );
+      </Container>
+    );
 };
 
 export default Login;

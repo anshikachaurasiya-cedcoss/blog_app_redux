@@ -1,13 +1,22 @@
-import { Grid, IconButton, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import { showBlog } from "../reducer/blogSlice";
 
-const Blogs = () => {
+const Blogs = (props) => {
+  let dispatch = useDispatch();
   const state = useSelector((state) => state.blogSlice);
-  const showBlogData = (item) => {
-    // console.log(item);
+
+  const showBlogData = (index) => {
+    dispatch(showBlog(index));
+    props.openModal();
   };
+
+  // console.log(state.blogDetail);
+
+ 
+
   return (
     <Grid
       container
@@ -36,7 +45,7 @@ const Blogs = () => {
               gap: "2px",
               cursor: "pointer",
             }}
-            onClick={() => showBlogData(item)}
+            onClick={() => showBlogData(index)}
           >
             <Typography variant="caption">{item.title}</Typography>
             <img
@@ -47,6 +56,7 @@ const Blogs = () => {
             <IconButton>
               <ThumbUpIcon />
             </IconButton>
+            
           </Grid>
         );
       })}
