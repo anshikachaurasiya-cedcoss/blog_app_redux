@@ -1,4 +1,4 @@
-import { Drawer, IconButton, Tooltip, Typography } from "@mui/material";
+import { Drawer, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,25 +6,21 @@ import {
   blogData,
   fetchBlogs,
   fetchUsers,
-  login,
-  showBlog,
+  showBlogs,
   userData,
 } from "../reducer/blogSlice";
-import BlogModal from "./BlogModal";
 import Blogs from "./Blogs";
 import Navbar from "./Navbar";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
+import ModalComp from "./ModalComp";
 
 const BlogPage = () => {
   let dispatch = useDispatch();
   const state = useSelector((state) => state.blogSlice);
-  let navigate = useNavigate();
 
   let [drawer, setDrawer] = useState(false);
   let [modal, setModal] = useState(false);
 
+  // function getting the data from local storage and dispatching the functions to set the states
   useEffect(() => {
     let blogsData = localStorage.getItem("BlogsData");
     if (blogsData) {
@@ -39,7 +35,7 @@ const BlogPage = () => {
       dispatch(fetchUsers());
     }
   }, []);
-
+  // function handles the sidebar
   const drawerHandler = () => {
     if (drawer) {
       setDrawer(false);
@@ -47,6 +43,7 @@ const BlogPage = () => {
       setDrawer(true);
     }
   };
+  // function handles the modal
   const openModal = () => {
     if (modal) {
       setModal(false);
@@ -54,14 +51,26 @@ const BlogPage = () => {
       setModal(true);
     }
   };
+  // function shows the users blogs
+  const showUsersBlog = (item) => {
+    let arr = [];
+    state.userBlogs.forEach((ele) => {
+      if (ele.userId === item.id) {
+        arr.push(ele);
+      }
+    });
+    dispatch(showBlogs(arr));
+  };
 
   return (
     <>
+      {/* rendering of navbar component */}
       <Navbar drawerHandler={drawerHandler} />
+      {/* rendering of sidebar */}
       <Box onClick={drawerHandler}>
         <Drawer open={drawer}>
           {state.users.length > 0 ? (
-            state.users.map((item) => {
+            state.users.map((item, index) => {
               return (
                 <Box
                   key={item.id}
@@ -74,25 +83,13 @@ const BlogPage = () => {
                     flexDirection: "row",
                     alignItems: "center",
                     justifyContent: "space-between",
+                    cursor: "pointer",
                   }}
+                  onClick={() => showUsersBlog(item)}
                 >
                   <Typography>
                     {item.firstName} {item.lastName}
                   </Typography>
-                  {/* {state.loginUser.email === item.email ? (
-                    <Box>
-                      <Tooltip title="Edit Blog">
-                        <IconButton onClick={() => editBlog(item)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <IconButton>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  ) : (
-                    <></>
-                  )} */}
                 </Box>
               );
             })
@@ -101,8 +98,22 @@ const BlogPage = () => {
           )}
         </Drawer>
       </Box>
-      {state.blogs.length > 0 ? <Blogs openModal={openModal} /> : <></>}
-      <BlogModal modal={modal} openModal={openModal} />
+      {/* rendering of blogs */}
+      {state.blogs.length > 0 ? (
+        <Blogs openModal={openModal} />
+      ) : (
+        // rendering of image if the blogs length is 0
+        <Box sx={{ paddingTop: "90px", textAlign: "center" }}>
+          <img
+            src="https://thumbs.dreamstime.com/b/man-magnifying-glass-rgb-color-icon-unsuccessful-searching-guy-making-research-no-suitable-results-found-isolated-vector-214309001.jpg"
+            alt=""
+            style={{ height: "200px", width: "200px" }}
+          />
+          <Typography variant="h6">No Blogs Written by this user!!</Typography>
+        </Box>
+      )}
+      {/* rendering of modal component */}
+      <ModalComp modal={modal} openModal={openModal} />
     </>
   );
 };

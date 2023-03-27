@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
@@ -25,6 +24,7 @@ const Login = () => {
   let location = useLocation();
   const state = useSelector((state) => state.blogSlice);
 
+  // function handles the snackbar
   const handleClose = () => {
     if (open.snackOpen) {
       open.snackOpen = false;
@@ -34,6 +34,7 @@ const Login = () => {
     setOpen({ ...open });
   };
 
+  // function runs on click of login button
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -48,7 +49,6 @@ const Login = () => {
         obj,
         config
       );
-      console.log(result.data);
       open.msg = "Successfully Login!!";
       open.severity = "success";
       handleClose();

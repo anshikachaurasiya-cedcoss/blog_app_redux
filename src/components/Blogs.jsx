@@ -1,33 +1,70 @@
 import { Box, Grid, IconButton, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import { showBlog } from "../reducer/blogSlice";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import {
+  addLikes,
+  delBlog,
+  edit,
+  removeLikes,
+  showBlog,
+} from "../reducer/blogSlice";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useState } from "react";
 
 const Blogs = (props) => {
   let dispatch = useDispatch();
   const state = useSelector((state) => state.blogSlice);
-
+  let [likeStyle, setLikeStyle] = useState("outlined");
+  // function shows the blogs data
   const showBlogData = (index) => {
     dispatch(showBlog(index));
     props.openModal();
   };
-
-  // console.log(state.blogDetail);
-
- 
+  // function adds or removes likes
+  const likesHandler = (index, e) => {
+    e.stopPropagation();
+    let obj = {};
+    if (Object.keys(state.blogs[index]).includes("liked")) {
+      if (state.blogs[index].liked) {
+        likeStyle = "outlined";
+        dispatch(removeLikes({ index: index }));
+      } else {
+        likeStyle = "contained";
+        dispatch(addLikes({ index: index }));
+      }
+    } else {
+      obj = { liked: true };
+      dispatch(addLikes({ index: index, obj: obj }));
+      likeStyle = "contained";
+    }
+    setLikeStyle(likeStyle);
+  };
+  // function deletes the blog
+  const deleteBlog = (e, index) => {
+    e.stopPropagation();
+    dispatch(delBlog(index));
+  };
+  // function edits the blog
+  const editBlog = (e, index) => {
+    e.stopPropagation();
+    dispatch(edit(index));
+    props.openModal();
+  };
 
   return (
     <Grid
       container
       sx={{
-        padding: "20px",
+        padding: "90px 20px 20px 20px",
         gap: "10px",
         justifyContent: "center",
       }}
     >
+      {/* rendering of blogs  */}
       {state.blogs.map((item, index) => {
-        // console.log(item);
         return (
           <Grid
             sm={3}
@@ -53,10 +90,38 @@ const Blogs = (props) => {
               alt=""
               style={{ height: "50%", width: "80%" }}
             />
-            <IconButton>
-              <ThumbUpIcon />
-            </IconButton>
-            
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              {item.reactions} Likes :
+              <IconButton onClick={(e) => likesHandler(index, e)}>
+                {item.liked && item.liked !== undefined ? (
+                  <FavoriteIcon sx={{ color: "red" }} />
+                ) : (
+                  <FavoriteBorderIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Box>
+            {state.loginUser.id === item.userId ? (
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Tooltip title="Edit Blog">
+                  <IconButton onClick={(e) => editBlog(e, index)}>
+                    <EditIcon sx={{ color: "blue" }} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Blog">
+                  <IconButton onClick={(e) => deleteBlog(e, index)}>
+                    <DeleteIcon sx={{ color: "red" }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            ) : (
+              <></>
+            )}
           </Grid>
         );
       })}
