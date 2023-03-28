@@ -131,6 +131,10 @@ const Login = () => {
               Sign In
             </Button>
           </Box>
+          <Typography variant="h6">Sample Data for login:</Typography>
+          <Typography variant="label1">
+            UserId: 1,&nbsp;Username: atuny0,&nbsp;password: 9uQFF1Lh
+          </Typography>
         </Box>
       </Container>
     );
